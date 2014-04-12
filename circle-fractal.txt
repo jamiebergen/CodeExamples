@@ -1,0 +1,62 @@
+;; File name: circle-fractal.rkt
+;; Author: Jamie Bergen
+;; Date created: Aug. 2, 2013 
+;;   (as a bonus problem for Intro to Systematic Program Design I)
+;; Date last modified: Apr. 12, 2014
+;; Runs in Racket/Intermediate Student Language
+;; Description: The function "circles" creates a fractal in which each
+;;   circle is surrounded by circles that are two-fifths smaller.
+
+(require 2htdp/image)
+
+;; =================
+;; Constants:
+
+(define STEP (/ 2 5))
+(define TRIVIAL-SIZE 5)
+
+;; ================
+;; Functions:
+
+;; Number -> Image
+;; draws a circle fractal with each circle surrounded by four circles that are two-fifths smaller
+(check-expect (circles (* TRIVIAL-SIZE (/ 25 4))) 
+              (local [(define leaf 
+                        (above (circle TRIVIAL-SIZE "solid" "blue")
+                               (beside (circle TRIVIAL-SIZE "solid" "blue")
+                                       (circle (* TRIVIAL-SIZE (/ 5 2)) "solid" "blue")
+                                       (circle TRIVIAL-SIZE "solid" "blue"))))]
+                (beside
+                 (rotate 90 leaf)
+                 (above 
+                  leaf
+                  (circle (* TRIVIAL-SIZE (/ 25 4)) "solid" "blue")
+                  (rotate 180 leaf))
+                 (rotate 270 leaf))))
+
+(define (circles r)
+  (local [(define one-leaf (leaf (* r STEP)))]
+    (beside
+     (rotate 90 one-leaf)
+     (above 
+      one-leaf
+      (circle r "solid" "blue")
+      (rotate 180 one-leaf))
+     (rotate 270 one-leaf))))
+
+
+;; Number -> Image
+;; draws the top leaf
+(check-expect (leaf TRIVIAL-SIZE)
+              (circle TRIVIAL-SIZE "solid" "blue"))
+
+(define (leaf r)
+  (if (<= r TRIVIAL-SIZE)
+      (circle r "solid" "blue")
+      (above (leaf (* r STEP))
+             (beside (rotate 90 (leaf (* r STEP))) 
+                     (circle r "solid" "blue") 
+                     (rotate 270 (leaf (* r STEP)))))))
+
+
+(circles 100)
