@@ -1,0 +1,42 @@
+(* Programming Languages Assignment 1 - Challenge Problems *)
+(* 
+File name: dates_challenge.sml
+Author: Jamie Bergen
+Date created: Oct. 13, 2013
+   (as a challenge problem for Programming Languages)
+Date last modified: Apr. 12, 2014
+Description: A function that determines if a date is a "real date" in the common era, 
+   accounting for leap years (runs in Standard ML)
+*)
+
+(* Note that a “date” is an SML value of type int*int*int, where the first part (#1 date) is the year, the second part (#2 date) is the month, and the third part (#3 date) is the day. *)
+
+fun is_leap_year (year : int) = 
+    (year mod 400 = 0) orelse (year mod 4 = 0 andalso year mod 100 <> 0)
+
+
+fun in_list (ints : int list, num : int) = 
+    if null ints then false
+    else 
+        if num = hd ints then true
+        else in_list(tl ints, num)
+
+
+fun reasonable_date (date : (int*int*int)) = 
+    let 
+        val valid_year = #1 date > 0
+        val valid_month = #2 date >= 1 andalso #2 date <= 12
+        val months_with_31 = [1, 3, 5, 7, 8, 10, 12];
+        val months_with_30 = [4, 6, 9, 11];
+        fun valid_day() = 
+            if in_list(months_with_31, #2 date) andalso #3 date <= 31
+            then true
+            else if in_list(months_with_30, #2 date) andalso #3 date <= 30
+            then true
+            else if is_leap_year(#1 date) andalso #3 date <= 29
+            then true
+            else #3 date <= 28
+    in 
+        valid_year andalso valid_month andalso valid_day()
+    end
+
